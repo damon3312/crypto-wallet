@@ -35,11 +35,62 @@ button {
   margin-bottom: 1.2rem;
   border: none;
   border-radius: 5px;
-  background-color: #61dafb;
+  background-color: #1c1aa8;
   color: #fff;
   cursor: pointer;
 }
 
-button :hover{
-  color: rgb(180, 10, 10);
+button:hover {
+  background-color: #810a0a;
+}
+
+
+p {
+  color: #fff;
+}
+
+h1 {
+  color: #fff;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: #fff;
+  padding: 40px;
+  border-radius: 10px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+}
+
+input[type="text"],
+input[type="password"] {
+  padding: 10px;
+  margin: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 1.2rem;
+}
+
+label {
+  font-size: 1.3rem;
+  margin-bottom: 10px;
+}
+
+.submit-btn {
+  padding: 15px 30px;
+  margin: 20px;
+  font-size: 1.5rem;
+  margin-top: 1.7rem;
+  margin-bottom: 1.2rem;
+  border: none;
+  border-radius: 5px;
+  background-color: #1c1aa8;
+  color: #fff;
+  cursor: pointer;
+}
+
+.submit-btn:hover {
+  background-color: #810a0a;
 }
