@@ -39,3 +39,7 @@ button {
   color: #fff;
   cursor: pointer;
 }
+
+button :hover{
+  color: rgb(180, 10, 10);
+}
