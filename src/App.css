@@ -94,3 +94,7 @@ label {
 .submit-btn:hover {
   background-color: #810a0a;
 }
+
+li{
+  color: white;
+}

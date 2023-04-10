@@ -158,6 +158,61 @@ function Dashboard() {
   );
 }
 
+function ViewAssets(){
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const assets = ["AVAX","LUNA","FET"];
+
+  useEffect(() => {
+    assets.forEach(asset => {
+      const getData = async () => {
+      try {
+        const response = await fetch(
+          `https://api.coincap.io/v2/assets?search=${asset}`
+        );
+        if (!response.ok) {
+          throw new Error(
+            `This is an HTTP error: The status is ${response.status}`
+          );
+        }
+        let actualData = await response.json();
+        console.log(actualData['data']);
+        setData(actualData["data"]);
+        setError(null);
+      } catch (err) {
+        setError(err.message);
+        setData(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+    getData();
+    });
+    
+  }, []);
+
+
+  return(
+    <div>
+      <h1>API Posts</h1>
+      {loading && <div>Just one sec...</div>}
+      {error && (
+        <div>{`There is a problem fetching the post data - ${error}`}</div>
+      )}
+      <ul>
+        {data &&
+          data.map(({ id, name, priceUsd }) => (
+            <li key={id}>
+              <h3>{name}: ${priceUsd}</h3>
+            </li>
+          ))}
+      </ul>
+    </div>
+  );
+}
+
 function Wallet(){
   const [walletName, setWalletName] = useState('');
   const [walletAddress, setWalletAddress] = useState('');
@@ -241,6 +296,7 @@ function App() {
         <Route path="/sendCrypto" element={<SendCrypto/>} />
         <Route path="/recieveCrypto" element={<RecieveCrypto/>} />
         <Route path="/history" element={<History/>} />
+        <Route path="/viewAssets" element={<ViewAssets/>} />
       </Routes>
     </Router>
   );
