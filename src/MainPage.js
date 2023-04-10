@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 
 function Home() {
@@ -32,6 +32,7 @@ function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
+
   const loginCheck = async (event) => {
     event.preventDefault();
 
@@ -41,7 +42,8 @@ function Login() {
 
     // Check if user details are valid
     if (data.length > 0) {
-      // If valid, redirect to user dashboard
+      // If valid, set the logged in username and redirect to user dashboard
+      localStorage.setItem('username', data[0].username);
       window.location.href = '/dashboard';
     } else {
       // If invalid, display error message
@@ -79,6 +81,7 @@ function Login() {
     </div>
   );
 }
+
 
 function CreateAccount() {
   const [username, setUsername] = useState('');
@@ -139,6 +142,46 @@ function CreateAccount() {
   );
 }
 
+function Dashboard() {
+  const username = localStorage.getItem('username');
+  return (
+    <div className="center">
+      <h1 className="title">Welcome, {username} </h1>
+      <h2 className="subtitle">Please select from the options below</h2>
+      <div>
+        <Link to="/wallet"><button>View Wallet</button></Link>
+        <Link to="/sendCrypto"><button>Send Crypto</button></Link>
+        <Link to="/recieveCrypto"><button>Recieve Crypto</button></Link>
+        <Link to="/History"><button>View History</button></Link>
+      </div>
+    </div>
+  );
+}
+
+function Wallet(){
+  return(
+    <h1> WALLET </h1>
+  );
+}
+
+function SendCrypto(){
+  return(
+    <h1>SEND CRYPTO</h1>
+  );
+}
+
+function RecieveCrypto(){
+  return(
+    <h1>RECIEVE CRYPTO</h1>
+  );
+}
+
+function History(){
+  return(
+    <h1>HISTORY</h1>
+  );
+}
+
 function App() {
   return (
     <Router>
@@ -147,6 +190,11 @@ function App() {
         <Route path="/about" element={<About />} />
         <Route path="/login" element={<Login />} />
         <Route path="/createAccount" element={<CreateAccount />} />
+        <Route path="/dashboard" element={<Dashboard/>} />
+        <Route path="/wallet" element={<Wallet/>} />
+        <Route path="/sendCrypto" element={<SendCrypto/>} />
+        <Route path="/recieveCrypto" element={<RecieveCrypto/>} />
+        <Route path="/history" element={<History/>} />
       </Routes>
     </Router>
   );
