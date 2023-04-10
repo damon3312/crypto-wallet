@@ -1,8 +1,5 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-
-
-
 
 function Home() {
   return (
@@ -17,7 +14,6 @@ function Home() {
     </div>
   );
 }
-
 
 function About() {
   return (
@@ -36,10 +32,15 @@ function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  const handleSubmit = (event) => {
+  const loginCheck = async (event) => {
     event.preventDefault();
-    // Check if login details are valid
-    if (username === 'user' && password === 'password') {
+
+    // Send a GET request to fetch the user details
+    const response = await fetch(`http://localhost:8000/details?username=${username}&password=${password}`);
+    const data = await response.json();
+
+    // Check if user details are valid
+    if (data.length > 0) {
       // If valid, redirect to user dashboard
       window.location.href = '/dashboard';
     } else {
@@ -47,19 +48,25 @@ function Login() {
       setError('Invalid username or password. Please try again.');
     }
   };
-
+  
   return (
     <div className="center">
       <h1>Login</h1>
       {error && <p className="error">{error}</p>}
-      <form className="form" onSubmit={handleSubmit}>
+      <form className="form" onSubmit={loginCheck}>
         <div className="form-control">
           <label htmlFor="username">Username:</label>
-          <input type="text" id="username" name="username" value={username} onChange={(event) => setUsername(event.target.value)} required />
+          <input type="text" id="username" name="username" 
+            value={username} 
+            onChange={(event) => setUsername(event.target.value)} 
+          required />
         </div>
         <div className="form-control">
           <label htmlFor="password">Password:</label>
-          <input type="password" id="password" name="password" value={password} onChange={(event) => setPassword(event.target.value)} required />
+          <input type="password" id="password" name="password" 
+            value={password} 
+            onChange={(event) => setPassword(event.target.value)} 
+          required />
         </div>
         <button type="submit">Sign In</button>
       </form>
@@ -78,11 +85,34 @@ function CreateAccount() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  const handleSubmit = (event) => {
+  function handleSubmit(event) {
     event.preventDefault();
-    // TODO: Add logic to create new user with username and password
-    console.log(`Username: ${username}, Password: ${password}`);
-  };
+    // Create new user with username and password
+    const newUser = { username, password };
+
+    fetch('http://localhost:8000/details', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newUser)
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log(data);
+        // Redirect to login page
+        window.location.href = '/login';
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        setError('Unable to create account. Please try again later.');
+      });
+  }
+  
+  
 
   return (
     <div className="center">
@@ -97,7 +127,7 @@ function CreateAccount() {
           <label htmlFor="password">Password:</label>
           <input type="password" id="password" name="password" value={password} onChange={(event) => setPassword(event.target.value)} required />
         </div>
-        <Link to="/login"><button type="submit">Create Account</button></Link>
+        <button type="submit">Create Account</button>
       </form>
       <p>Already have an account?</p> 
       <div>
