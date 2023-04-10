@@ -159,15 +159,15 @@ function Dashboard() {
 }
 
 function ViewAssets(){
-  const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const Crypto = (id, symbol, name, usdPrice) => { return { id: id, symbol: symbol, name: name, usdPrice : usdPrice } }
+  const [currentAssets, setCurrentAsset] = useState([]);
 
-  const assets = ["AVAX","LUNA","FET"];
+  const assets = ["AVAX","LUNA","FET","DOGE"];
 
   useEffect(() => {
-    assets.forEach(asset => {
-      const getData = async () => {
+      const getData = async (asset) => {
       try {
         const response = await fetch(
           `https://api.coincap.io/v2/assets?search=${asset}`
@@ -178,36 +178,33 @@ function ViewAssets(){
           );
         }
         let actualData = await response.json();
-        console.log(actualData['data']);
-        setData(actualData["data"]);
+        setCurrentAsset(currentAssets => [...currentAssets, Crypto(actualData['data']['0']['id'], actualData['data']['0']['symbol'], actualData['data']['0']['name'], actualData['data']['0']['priceUsd'])]);
         setError(null);
       } catch (err) {
         setError(err.message);
-        setData(null);
       } finally {
         setLoading(false);
       }
-    };
-    getData();
-    });
-    
+      };
+      assets.forEach(asset => {
+        getData(asset);
+     });
   }, []);
-
 
   return(
     <div>
-      <h1>API Posts</h1>
+      <h1>Crypto Balance</h1>
       {loading && <div>Just one sec...</div>}
       {error && (
         <div>{`There is a problem fetching the post data - ${error}`}</div>
       )}
+      
       <ul>
-        {data &&
-          data.map(({ id, name, priceUsd }) => (
-            <li key={id}>
-              <h3>{name}: ${priceUsd}</h3>
-            </li>
-          ))}
+        { currentAssets.map((asset) => <li key={asset.id}>{asset.name}</li>)}
+        
+
+
+        
       </ul>
     </div>
   );
