@@ -159,8 +159,54 @@ function Dashboard() {
 }
 
 function Wallet(){
-  return(
-    <h1> WALLET </h1>
+  const [walletName, setWalletName] = useState('');
+  const [walletAddress, setWalletAddress] = useState('');
+  const [password, setPassword] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+
+  function generateWalletAddress() {
+    const characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    let result = '';
+    const charactersLength = characters.length;
+    for (let i = 0; i < 26; i++) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    setWalletAddress(result);
+  }
+
+  function handleSubmit(event) {
+    event.preventDefault();
+    if (password.length < 12 || !/[A-Z]/.test(password) || !/[\W_]/.test(password)) {
+      setPasswordError('Password must be at least 12 characters long and contain at least one uppercase letter and one special character.');
+    } 
+  }
+
+  return (
+    <div>
+      <h1>Create Wallet</h1>
+      <form onSubmit={handleSubmit}>
+        <label>
+          Wallet Name:
+          <input type="text" value={walletName} onChange={(event) => setWalletName(event.target.value)} style={{ width: '300px' }} required />
+        </label>
+        <br />
+          
+        <label>
+          Wallet Address:
+          <button type="button" onClick={generateWalletAddress}>Generate Wallet Address</button>
+          <input type="text" value={walletAddress} onChange={(event) => setWalletAddress(event.target.value)} style={{ width: '300px' }} required />
+        </label>
+
+        <label>
+          Password:
+          <input type="password" value={password} onChange={(event) => setPassword(event.target.value)} style={{ width: '300px' }} required /> 
+        </label>
+        {passwordError && <p style={{ color: 'red' }}>{passwordError}</p>}
+        <br />
+        <button type="submit">Create Wallet</button>
+        <Link to="/"><button>Home</button></Link>
+      </form>
+    </div>
   );
 }
 
