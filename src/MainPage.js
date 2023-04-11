@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import coincap from './coincap';
 
 function Home() {
   return (
@@ -173,13 +174,13 @@ function ViewAssets(){
   userAssets.push(userAsset("FET",1.902));
   userAssets.push(userAsset("DOGE",3453.89));
 
-  console.log(userAssets);
+  //console.log(userAssets);
 
   React.useEffect(() => {
       const getData = async (asset) => {
       try {
         const response = await fetch(
-          `https://api.coincap.io/v2/assets?search=${asset.symbol}`
+          `https://api.coincap.io/v2/assets?search=${asset.symbol}&Authorization=${coincap}`
         );
         if (!response.ok) {
           throw new Error(
@@ -243,69 +244,86 @@ function ViewAssets(){
       return sortConfig.key === name ? sortConfig.direction : undefined;
     };
     return (
-      <table className='assetTable'>
-        <thead>
-          <tr>
-            <th>
-              <button
-                type="button"
-                onClick={() => requestSort('name')}
-                className={getClassNamesFor('name')}
-              >
-                Coin
-              </button>
-            </th>
-            <th>
-              <button
-                type="button"
-                onClick={() => requestSort('amount')}
-                className={getClassNamesFor('amount')}
-              >
-                Amount
-              </button>
-            </th>
-            <th>
-              <button
-                type="button"
-                onClick={() => requestSort('usdPrice')}
-                className={getClassNamesFor('usdPrice')}
-              >
-                Market Value
-              </button>
-            </th>
-            <th>
-              <button
-                type="button"
-                onClick={() => requestSort('total')}
-                className={getClassNamesFor('total')}
-              >
-                Total Balance
-              </button>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {items.map((item) => (
-            <tr key={item.id}>
-              <td>{item.name}</td>
-              <td>{item.amount}</td>
-              <td>${Number(item.usdPrice).toFixed(6)}</td>
-              <td>${item.total.toFixed(6)}</td>
+      <div className='assetTable'>
+        <table >
+          <thead>
+            <tr>
+              <th>
+                <button
+                  type="button"
+                  onClick={() => requestSort('name')}
+                  className={getClassNamesFor('name')}
+                >
+                  Coin
+                </button>
+              </th>
+              <th>
+                <button
+                  type="button"
+                  onClick={() => requestSort('amount')}
+                  className={getClassNamesFor('amount')}
+                >
+                  Amount
+                </button>
+              </th>
+              <th>
+                <button
+                  type="button"
+                  onClick={() => requestSort('usdPrice')}
+                  className={getClassNamesFor('usdPrice')}
+                >
+                  Market Value
+                </button>
+              </th>
+              <th>
+                <button
+                  type="button"
+                  onClick={() => requestSort('total')}
+                  className={getClassNamesFor('total')}
+                >
+                Total
+                </button>
+              </th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {items.map((item) => (
+              <tr key={item.id}>
+                <td>{item.name}</td>
+                <td>{item.amount}</td>
+                <td>${Number(item.usdPrice).toFixed(6)}</td>
+                <td>≈ ${item.total.toFixed(6)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+     
+    );
+  };
+
+  const EstimatedBalance = (props) => {
+    var totalbalance = 0;
+    props.asset.forEach(asset => {
+      totalbalance+=asset.total;
+    });
+    return(
+      <div className='estimatedBal'>
+        Estimated Balance ≈ ${totalbalance.toFixed(6)}
+      </div>
     );
   };
 
   return(
     <div className='mine'>
-      <h1>Crypto Balance</h1>
+      <h1>My Crypto</h1>
       {loading && <div>Just one sec...</div>}
       {error && (
         <div>{`There is a problem fetching the post data - ${error}`}</div>
       )}
-      
+      <EstimatedBalance 
+        asset={currentAssets}
+      />
       <AssetTable
         asset={currentAssets}
       />

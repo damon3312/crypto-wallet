@@ -118,4 +118,30 @@ label {
 
 .assetTable{
   color: white;
+  border-radius: 20px;
+  height: 70vh;
+  padding: 0 10px 10px 10px;
+  overflow: scroll; 
+}
+
+.assetTable Table thead{
+  position: sticky;
+  top: 0px;
+  margin: 0 0 0 0;
+  background-color: #fff;
+}
+
+.assetTable Button{
+  margin: 0;
+}
+
+.estimatedBal{
+  color: white;
+  padding: 15px 30px;
+  margin: 20px;
+  font-size: 1.5rem;
+  margin-top: 1.7rem;
+  margin-bottom: 1.2rem;
+  border-radius: 10px;
+  background-color: #bf227b;
 }
