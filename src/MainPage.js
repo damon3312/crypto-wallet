@@ -161,16 +161,25 @@ function Dashboard() {
 function ViewAssets(){
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const Crypto = (id, symbol, name, usdPrice) => { return { id: id, symbol: symbol, name: name, usdPrice : usdPrice } }
+  const Crypto = (id, symbol, name, usdPrice, amount, total) => { return { id: id, symbol: symbol, name: name, usdPrice : usdPrice, amount: amount, total: total } }
   const [currentAssets, setCurrentAsset] = useState([]);
+  const userAsset = (symbol, amount) => { return { symbol: symbol, amount: amount } }
 
-  const assets = ["AVAX","LUNA","FET","DOGE"];
 
-  useEffect(() => {
+  const userAssets = [];
+  
+  userAssets.push(userAsset("AVAX",0.2134));
+  userAssets.push(userAsset("LUNA",54.15));
+  userAssets.push(userAsset("FET",1.902));
+  userAssets.push(userAsset("DOGE",3453.89));
+
+  console.log(userAssets);
+
+  React.useEffect(() => {
       const getData = async (asset) => {
       try {
         const response = await fetch(
-          `https://api.coincap.io/v2/assets?search=${asset}`
+          `https://api.coincap.io/v2/assets?search=${asset.symbol}`
         );
         if (!response.ok) {
           throw new Error(
@@ -178,7 +187,7 @@ function ViewAssets(){
           );
         }
         let actualData = await response.json();
-        setCurrentAsset(currentAssets => [...currentAssets, Crypto(actualData['data']['0']['id'], actualData['data']['0']['symbol'], actualData['data']['0']['name'], actualData['data']['0']['priceUsd'])]);
+        setCurrentAsset(currentAssets => [...currentAssets, Crypto(actualData['data']['0']['id'], actualData['data']['0']['symbol'], actualData['data']['0']['name'], actualData['data']['0']['priceUsd'], asset.amount, Number(actualData['data']['0']['priceUsd'])*asset.amount)]);
         setError(null);
       } catch (err) {
         setError(err.message);
@@ -186,26 +195,127 @@ function ViewAssets(){
         setLoading(false);
       }
       };
-      assets.forEach(asset => {
+      userAssets.forEach(asset => {
         getData(asset);
      });
   }, []);
 
+  const useSortableData = (items, config = null) => {
+    const [sortConfig, setSortConfig] = React.useState(config);
+  
+    const sortedItems = React.useMemo(() => {
+      let sortableItems = [...items];
+      if (sortConfig !== null) {
+        sortableItems.sort((a, b) => {
+          if (a[sortConfig.key] < b[sortConfig.key]) {
+            return sortConfig.direction === 'ascending' ? -1 : 1;
+          }
+          if (a[sortConfig.key] > b[sortConfig.key]) {
+            return sortConfig.direction === 'ascending' ? 1 : -1;
+          }
+          return 0;
+        });
+      }
+      return sortableItems;
+    }, [items, sortConfig]);
+  
+    const requestSort = (key) => {
+      let direction = 'ascending';
+      if (
+        sortConfig &&
+        sortConfig.key === key &&
+        sortConfig.direction === 'ascending'
+      ) {
+        direction = 'descending';
+      }
+      setSortConfig({ key, direction });
+    };
+  
+    return { items: sortedItems, requestSort, sortConfig };
+  };
+  
+  const AssetTable = (props) => {
+    const { items, requestSort, sortConfig } = useSortableData(props.asset);
+    const getClassNamesFor = (name) => {
+      if (!sortConfig) {
+        return;
+      }
+      return sortConfig.key === name ? sortConfig.direction : undefined;
+    };
+    return (
+      <table className='assetTable'>
+        <thead>
+          <tr>
+            <th>
+              <button
+                type="button"
+                onClick={() => requestSort('name')}
+                className={getClassNamesFor('name')}
+              >
+                Coin
+              </button>
+            </th>
+            <th>
+              <button
+                type="button"
+                onClick={() => requestSort('amount')}
+                className={getClassNamesFor('amount')}
+              >
+                Amount
+              </button>
+            </th>
+            <th>
+              <button
+                type="button"
+                onClick={() => requestSort('usdPrice')}
+                className={getClassNamesFor('usdPrice')}
+              >
+                Market Value
+              </button>
+            </th>
+            <th>
+              <button
+                type="button"
+                onClick={() => requestSort('total')}
+                className={getClassNamesFor('total')}
+              >
+                Total Balance
+              </button>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {items.map((item) => (
+            <tr key={item.id}>
+              <td>{item.name}</td>
+              <td>{item.amount}</td>
+              <td>${Number(item.usdPrice).toFixed(6)}</td>
+              <td>${item.total.toFixed(6)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    );
+  };
+
   return(
-    <div>
+    <div className='mine'>
       <h1>Crypto Balance</h1>
       {loading && <div>Just one sec...</div>}
       {error && (
         <div>{`There is a problem fetching the post data - ${error}`}</div>
       )}
       
-      <ul>
-        { currentAssets.map((asset) => <li key={asset.id}>{asset.name}</li>)}
-        
+      <AssetTable
+        asset={currentAssets}
+      />
+      
+      { //currentAssets.map((asset) => <li key={asset.id}>{asset.name}</li>)}
+      }
 
 
         
-      </ul>
+      
     </div>
   );
 }
