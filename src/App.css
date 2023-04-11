@@ -117,11 +117,12 @@ label {
 }
 
 .assetTable{
-  color: white;
+  color: black;
   border-radius: 20px;
   height: 70vh;
   padding: 0 10px 10px 10px;
   overflow: scroll; 
+  background-color: white;
 }
 
 .assetTable Table thead{
@@ -129,16 +130,18 @@ label {
   top: 0px;
   margin: 0 0 0 0;
   background-color: #fff;
+  
 }
 
 .assetTable Button{
   margin: 0;
+  width: 15vw;
 }
 
 .estimatedBal{
   color: white;
   padding: 15px 30px;
-  margin: 20px;
+  margin: 10px;
   font-size: 1.5rem;
   margin-top: 1.7rem;
   margin-bottom: 1.2rem;

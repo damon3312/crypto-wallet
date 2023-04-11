@@ -154,6 +154,10 @@ function Dashboard() {
         <Link to="/sendCrypto"><button>Send Crypto</button></Link>
         <Link to="/viewWallet"><button>View Wallet</button></Link>
         <Link to="/TransactionHistory"><button>Transaction History</button></Link>
+        <Link to="/recieveCrypto"><button>Recieve Crypto</button></Link>
+        <Link to="/History"><button>View History</button></Link>
+        <Link to="/viewAssets"><button>My Crypto</button></Link>
+
       </div>
     </div>
   );
@@ -169,9 +173,9 @@ function ViewAssets(){
 
   const userAssets = [];
   
-  userAssets.push(userAsset("AVAX",0.2134));
+  userAssets.push(userAsset("AVAX",6.2134));
   userAssets.push(userAsset("LUNA",54.15));
-  userAssets.push(userAsset("FET",1.902));
+  userAssets.push(userAsset("FET",19.0223));
   userAssets.push(userAsset("DOGE",3453.89));
 
   //console.log(userAssets);
@@ -180,7 +184,7 @@ function ViewAssets(){
       const getData = async (asset) => {
       try {
         const response = await fetch(
-          `https://api.coincap.io/v2/assets?search=${asset.symbol}&Authorization=${coincap}`
+          `https://api.coincap.io/v2/assets?search=${asset.symbol}`
         );
         if (!response.ok) {
           throw new Error(
@@ -326,14 +330,7 @@ function ViewAssets(){
       />
       <AssetTable
         asset={currentAssets}
-      />
-      
-      { //currentAssets.map((asset) => <li key={asset.id}>{asset.name}</li>)}
-      }
-
-
-        
-      
+      />      
     </div>
   );
 }
