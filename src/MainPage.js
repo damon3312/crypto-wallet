@@ -150,10 +150,10 @@ function Dashboard() {
       <h1 className="title">Welcome, {username} </h1>
       <h2 className="subtitle">Please select from the options below</h2>
       <div>
-        <Link to="/wallet"><button>View Wallet</button></Link>
+        <Link to="/createWallet"><button>Create Wallet</button></Link>
         <Link to="/sendCrypto"><button>Send Crypto</button></Link>
-        <Link to="/recieveCrypto"><button>Recieve Crypto</button></Link>
-        <Link to="/History"><button>View History</button></Link>
+        <Link to="/viewWallet"><button>View Wallet</button></Link>
+        <Link to="/TransactionHistory"><button>Transaction History</button></Link>
       </div>
     </div>
   );
@@ -338,7 +338,7 @@ function ViewAssets(){
   );
 }
 
-function Wallet(){
+function CreateWallet(){
   const [walletName, setWalletName] = useState('');
   const [walletAddress, setWalletAddress] = useState('');
   const [password, setPassword] = useState('');
@@ -384,7 +384,7 @@ function Wallet(){
         {passwordError && <p style={{ color: 'red' }}>{passwordError}</p>}
         <br />
         <button type="submit">Create Wallet</button>
-        <Link to="/"><button>Home</button></Link>
+        <Link to="/dashboard"><button>Back</button></Link>
       </form>
     </div>
   );
@@ -396,13 +396,13 @@ function SendCrypto(){
   );
 }
 
-function RecieveCrypto(){
+function ViewWallet(){
   return(
-    <h1>RECIEVE CRYPTO</h1>
+    <h1>VIEW WALLET</h1>
   );
 }
 
-function History(){
+function TransactionHistory(){
   return(
     <h1>HISTORY</h1>
   );
@@ -417,10 +417,10 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/createAccount" element={<CreateAccount />} />
         <Route path="/dashboard" element={<Dashboard/>} />
-        <Route path="/wallet" element={<Wallet/>} />
+        <Route path="/createWallet" element={<CreateWallet/>} />
         <Route path="/sendCrypto" element={<SendCrypto/>} />
-        <Route path="/recieveCrypto" element={<RecieveCrypto/>} />
-        <Route path="/history" element={<History/>} />
+        <Route path="/viewWallet" element={<ViewWallet/>} />
+        <Route path="/TransactionHistory" element={<TransactionHistory/>} />
         <Route path="/viewAssets" element={<ViewAssets/>} />
       </Routes>
     </Router>
