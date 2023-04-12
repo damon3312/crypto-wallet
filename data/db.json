@@ -52,6 +52,23 @@
           "coin": "BTC",
           "amount": "0.10"
         }
+      ],
+      "walletDetails": [
+        {
+          "walletName": "wallet1",
+          "walletAddress": "SBA888QUZahEyf0Ge9BL5apyzb",
+          "walletPassword": "Wallet12345@",
+          "wallet": [
+            {
+              "coin": "BTC",
+              "value": "0.05"
+            },
+            {
+              "coin": "ETH",
+              "value": "0.05"
+            }
+          ]
+        }
       ]
     }
   ]

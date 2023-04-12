@@ -373,6 +373,7 @@ function CreateWallet() {
         walletName: walletName,
         walletAddress: walletAddress,
         walletPassword: password,
+        wallet: []
       };
 
       // Send POST request to add new wallet to database
@@ -511,8 +512,34 @@ function SendCrypto() {
 }
 
 function ViewWallet(){
+
+  const [wallet, setWallet] = useState([]);
+  const username = localStorage.getItem('username');
+
+  useEffect(() => {
+    fetchWallet();
+  }, []);
+
+  const fetchWallet = async () => {
+
+    // Send a GET request to fetch the user details
+    const response = await fetch(`http://localhost:8000/details?username=${username}`);
+    const txdata = await response.json();
+    
+    setWallet(txdata[0].walletDetails[0].wallet);
+
+  }
+
   return(
-    <h1>VIEW WALLET</h1>
+    <div className="txApp">
+
+      <h1>VIEW WALLET</h1>
+      <DataTable value={wallet}>
+        <Column field="coin" header="Coin"/>
+        <Column field="value" header="Value"/>
+      </DataTable>
+
+    </div>
   );
 }
 
