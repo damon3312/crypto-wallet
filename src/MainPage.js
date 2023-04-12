@@ -337,12 +337,15 @@ function ViewAssets(){
   );
 }
 
-function CreateWallet(){
+function CreateWallet() {
+  // Set up state variables to store input values and error messages
   const [walletName, setWalletName] = useState('');
   const [walletAddress, setWalletAddress] = useState('');
   const [password, setPassword] = useState('');
   const [passwordError, setPasswordError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
 
+  // Function to generate a random wallet address
   function generateWalletAddress() {
     const characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
     let result = '';
@@ -353,11 +356,58 @@ function CreateWallet(){
     setWalletAddress(result);
   }
 
-  function handleSubmit(event) {
+  // Function to handle form submission
+  async function handleSubmit(event) {
     event.preventDefault();
+    // Check password meets requirements
     if (password.length < 12 || !/[A-Z]/.test(password) || !/[\W_]/.test(password)) {
       setPasswordError('Password must be at least 12 characters long and contain at least one uppercase letter and one special character.');
-    } 
+    } else {
+      const username = localStorage.getItem('username');
+      const response = await fetch(`http://localhost:8000/details?username=${username}`);
+      const userData = await response.json();
+      const userId = userData[0].id;
+
+      // Create new wallet object
+      const newWallet = {
+        walletName: walletName,
+        walletAddress: walletAddress,
+        walletPassword: password,
+      };
+
+      // Send POST request to add new wallet to database
+      const requestOptions = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newWallet),
+      };
+
+      await fetch(`http://localhost:8000/wallet/${userId}`, requestOptions);
+
+      // Update user's details in database with new wallet details
+      const updatedUserData = [...userData];
+      const currentUserData = updatedUserData[0];
+      if (!currentUserData.walletDetails) {
+        currentUserData.walletDetails = [newWallet];
+      } else {
+        currentUserData.walletDetails.push(newWallet);
+      }
+
+      const updateUserRequestOptions = {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(currentUserData),
+      };
+
+      await fetch(`http://localhost:8000/details/${userId}`, updateUserRequestOptions);
+
+      // Reset the form after submitting and display success message to user
+      setWalletName('');
+      setWalletAddress('');
+      setPassword('');
+      setPasswordError('');
+      setSuccessMessage('Wallet created successfully!');
+    }
   }
 
   return (
@@ -369,7 +419,7 @@ function CreateWallet(){
           <input type="text" value={walletName} onChange={(event) => setWalletName(event.target.value)} style={{ width: '300px' }} required />
         </label>
         <br />
-          
+
         <label>
           Wallet Address:
           <button type="button" onClick={generateWalletAddress}>Generate Wallet Address</button>
@@ -377,12 +427,13 @@ function CreateWallet(){
         </label>
 
         <label>
-          Password:
-          <input type="password" value={password} onChange={(event) => setPassword(event.target.value)} style={{ width: '300px' }} required /> 
+          Wallet Password:
+          <input type="password" value={password} onChange={(event) => setPassword(event.target.value)} style={{ width: '300px' }} required />
         </label>
         {passwordError && <p style={{ color: 'red' }}>{passwordError}</p>}
         <br />
         <button type="submit">Create Wallet</button>
+        {successMessage && <p style={{ color: 'green' }}>{successMessage}</p>}
         <Link to="/dashboard"><button>Back</button></Link>
       </form>
     </div>
