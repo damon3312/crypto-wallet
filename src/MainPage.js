@@ -151,7 +151,7 @@ function Dashboard() {
       <h2 className="subtitle">Please select from the options below</h2>
       <div>
         <Link to="/createWallet"><button>Create Wallet</button></Link>
-        <Link to="/sendCrypto"><button>Send Crypto</button></Link>
+        <Link to="/sendCrypto"><button>Send Cryptocurrency</button></Link>
         <Link to="/viewWallet"><button>View Wallet</button></Link>
         <Link to="/TransactionHistory"><button>Transaction History</button></Link>
         <Link to="/recieveCrypto"><button>Recieve Crypto</button></Link>
@@ -387,9 +387,73 @@ function CreateWallet(){
   );
 }
 
-function SendCrypto(){
-  return(
-    <h1>SEND CRYPTO</h1>
+function SendCrypto() {
+  const [amount, setAmount] = useState('');
+  const [recipientAddress, setRecipientAddress] = useState('');
+  const [senderAddress, setSenderAddress] = useState('');
+  const [cryptoType, setCryptoType] = useState('avax'); // Default set to Avax
+  const [walletBalance, setWalletBalance] = useState(0);
+
+  const handleAmountChange = (event) => {
+    setAmount(event.target.value);
+  }
+
+  const handleRecipientAddressChange = (event) => {
+    setRecipientAddress(event.target.value);
+  }
+
+  const handleSenderAddressChange = (event) => {
+    setSenderAddress(event.target.value);
+  }
+
+  const handleCryptoTypeChange = (event) => {
+    setCryptoType(event.target.value);
+    setAmount(''); // Clear the amount when the crypto type changes
+  }
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+
+    if (parseFloat(amount) > walletBalance) {
+      alert(`You don't have enough ${cryptoType} in your wallet to send ${amount} ${cryptoType}`);
+      return;
+    }
+
+    const data = {
+      amount: amount,
+      recipientAddress: recipientAddress,
+      senderAddress: senderAddress,
+      cryptoType: cryptoType
+    };
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <div>
+        <label htmlFor="crypto-type">Cryptocurrency Type:</label>
+        <select id="crypto-type" value={cryptoType} onChange={handleCryptoTypeChange} style={{fontSize: "1.2em", width: "240px"}}>
+          <option value="avax">Avax</option>
+          <option value="luna">Luna</option>
+          <option value="fet">Fet</option>
+          <option value="doge">Doge</option>
+        </select>
+      </div>
+      <div>
+        <label htmlFor="amount">Amount ({cryptoType}):</label>
+        <input type="text" id="amount" value={amount} onChange={handleAmountChange} />
+        <span> (Max: {walletBalance} {cryptoType})</span>
+      </div>
+      <div>
+        <label htmlFor="sender-address">Wallet Address:</label>
+        <input type="text" id="sender-address" value={senderAddress} onChange={handleSenderAddressChange} />
+      </div>
+      <div>
+        <label htmlFor="recipient-address">Recipient Wallet Address:</label>
+        <input type="text" id="recipient-address" value={recipientAddress} onChange={handleRecipientAddressChange} />
+      </div>
+      <button type="submit">Send Cryptocurrency</button>
+      <Link to="/dashboard"><button>Back</button></Link>
+    </form>
   );
 }
 
