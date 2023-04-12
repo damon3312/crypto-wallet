@@ -19,6 +19,40 @@
       "username": "beebek",
       "password": "pass",
       "id": "dQK-UZE"
+    },
+    {
+      "username": "damon",
+      "password": "password1",
+      "id": "ELJscKq",
+      "txHistory": [
+        {
+          "id": "0",
+          "type": "RECEIVE",
+          "timestamp": "19:01:59 11/04/2023",
+          "sender": "3YPQr7x",
+          "receiver": "ELJscKq",
+          "coin": "BTC",
+          "amount": "0.05"
+        },
+        {
+          "id": "1",
+          "type": "SEND",
+          "timestamp": "19:01:59 11/04/2023",
+          "sender": "ELJscKq",
+          "receiver": "cJJWa4w",
+          "coin": "BTC",
+          "amount": "0.05"
+        },
+        {
+          "id": "3",
+          "type": "RECEIVE",
+          "timestamp": "20:01:59 11/04/2023",
+          "sender": "cJJWa4w",
+          "receiver": "ELJscKq",
+          "coin": "BTC",
+          "amount": "0.10"
+        }
+      ]
     }
   ]
 }

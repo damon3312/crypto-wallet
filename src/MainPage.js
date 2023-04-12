@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import coincap from './coincap';
+import { DataTable } from 'primereact/datatable';
+import { Column } from 'primereact/column';
+import "primereact/resources/themes/nova-alt/theme.css"
 
 function Home() {
   return (
@@ -463,11 +465,42 @@ function ViewWallet(){
   );
 }
 
-function TransactionHistory(){
+function TransactionHistory(){  
+
+  const [tx, setTx] = useState([]);
+  const username = localStorage.getItem('username');
+
+  useEffect(() => {
+    fetchTx();
+  }, []);
+
+  const fetchTx = async () => {
+
+    // Send a GET request to fetch the user details
+    const response = await fetch(`http://localhost:8000/details?username=${username}`);
+    const txdata = await response.json();
+    
+    setTx(txdata[0].txHistory);
+
+  }
+
   return(
-    <h1>HISTORY</h1>
-  );
-}
+    <div className="txApp">
+
+      <h1>Transaction History</h1>
+      <DataTable value={tx}>
+        <Column field="id" header="Id"/>
+        <Column field="type" header="Type"/>
+        <Column field="timestamp" header="Timestamp"/>
+        <Column field="sender" header="Sender"/>
+        <Column field="receiver" header="Receiver"/>
+        <Column field="coin" header="Coin"/>
+        <Column field="amount" header="Amount"/>
+      </DataTable>
+
+    </div>
+    );
+};
 
 function App() {
   return (
