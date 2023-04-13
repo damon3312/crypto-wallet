@@ -55,11 +55,19 @@
           "wallet": [
             {
               "coin": "BTC",
-              "value": "0.05"
+              "value": 1.6
             },
             {
               "coin": "ETH",
               "value": "0.05"
+            },
+            {
+              "coin": "ETH",
+              "value": "1.5"
+            },
+            {
+              "coin": "ETH",
+              "value": "1.3"
             }
           ]
         }

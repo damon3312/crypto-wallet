@@ -580,88 +580,92 @@ function TransactionHistory(){
     );
 };
 
-function DepositCrypto(){
-
-  const localUsername = localStorage.getItem('username');
-  const [coinform, setCoinform] = useState('');
-  const [amountform, setAmountform] = useState('');
+function DepositCrypto() {
+  const localUsername = localStorage.getItem("username");
+  const [coinform, setCoinform] = useState("");
+  const [amountform, setAmountform] = useState("");
 
   const handleSubmit = (event) => {
     event.preventDefault();
     depositPost();
-  }
+  };
 
   const depositPost = async () => {
-
-    /* Get all coins in wallet to see if coin already exist */
-    const response2 = await fetch(`http://localhost:8000/details?username=${localUsername}`);
+    // Get all coins in wallet to see if coin already exists
+    const response2 = await fetch(
+      `http://localhost:8000/details?username=${localUsername}`
+    );
     const data2 = await response2.json();
-    
-    /* iterate through the coins in user wallets and see if they match with the users input*/
+
+    // Iterate through the coins in user wallets and see if they match with the users input
     for (let i = 0; i < data2[0].walletDetails[0].wallet.length; ++i) {
-
-      if (data2[0].walletDetails[0].wallet[i].coin == coinform) {
-        /* If coin exists ...*/
-
-        fetch('http://localhost:8000/details')
-          .then(response => response.json())
-          .then(data => {
-            const user = data.find(obj => obj.username === localUsername);
-            if (user) {
-              user.walletDetails[0].wallet[i].value = Number(user.walletDetails[0].wallet[i].value) + Number(amountform)
-              // send updated data to server
-              fetch('http://localhost:8000/details', {
-                method: 'PUT',
-                headers: {
-                  'Content-Type': 'application/json'
+      if (data2[0].walletDetails[0].wallet[i].coin === coinform) {
+        // If coin exists, update the value
+        const newData = {
+          ...data2[0],
+          walletDetails: [
+            {
+              ...data2[0].walletDetails[0],
+              wallet: [
+                ...data2[0].walletDetails[0].wallet.slice(0, i),
+                {
+                  coin: coinform,
+                  value:
+                    parseFloat(data2[0].walletDetails[0].wallet[i].value) +
+                    parseFloat(amountform),
                 },
-                body: JSON.stringify(data)
-              })
-                .then(response => response.json())
-                .then(data => console.log(data))
-                .catch(error => console.error(error));
-            }
-          })
-          .catch(error => console.error(error));
-
-        console.log('done +')
-        break;
-
-      } else {
-        /* If coin doesn't exist ...*/
-
-        /* Create new pair ...*/
-        const coinPair = {
-          coin: coinform,
-          value: amountform
+                ...data2[0].walletDetails[0].wallet.slice(i + 1),
+              ],
+            },
+          ],
         };
 
-        fetch('http://localhost:8000/details')
-          .then(response => response.json())
-          .then(data => {
-            const user = data.find(obj => obj.username === localUsername);
-            if (user) {
-              user.walletDetails[0].wallet.push(coinPair)
-              // send updated data to server
-              fetch('http://localhost:8000/details', {
-                method: 'PUT',
-                headers: {
-                  'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-              })
-                .then(response => response.json())
-                .then(data => console.log(data))
-                .catch(error => console.error(error));
-            }
-          })
-          .catch(error => console.error(error));
-        
-        console.log('done -')
+        // send updated data to server
+        fetch(`http://localhost:8000/details/${data2[0].id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(newData),
+        })
+          .then((response) => response.json())
+          .then((data) => console.log(data))
+          .catch((error) => console.error(error));
+
+        break;
+      } else {
+        // If coin doesn't exist, create new pair
+        const coinPair = {
+          coin: coinform,
+          value: amountform,
+        };
+
+        const newData = {
+          ...data2[0],
+          walletDetails: [
+            {
+              ...data2[0].walletDetails[0],
+              wallet: [...data2[0].walletDetails[0].wallet, coinPair],
+            },
+          ],
+        };
+
+        // send updated data to server
+        fetch(`http://localhost:8000/details/${data2[0].id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(newData),
+        })
+          .then((response) => response.json())
+          .then((data) => console.log(data))
+          .catch((error) => console.error(error));
+
         break;
       }
     }
-  }
+  };
 
   return(
 
