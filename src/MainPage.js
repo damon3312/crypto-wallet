@@ -156,7 +156,7 @@ function Dashboard() {
         <Link to="/sendCrypto"><button>Send Cryptocurrency</button></Link>
         <Link to="/viewWallet"><button>View Wallet</button></Link>
         <Link to="/TransactionHistory"><button>Transaction History</button></Link>
-        <Link to="/recieveCrypto"><button>Recieve Crypto</button></Link>
+        <Link to="/receiveCrypto"><button>Deposit Crypto</button></Link>
         <Link to="/History"><button>View History</button></Link>
         <Link to="/viewAssets"><button>My Crypto</button></Link>
 
@@ -526,7 +526,7 @@ function ViewWallet(){
     const response = await fetch(`http://localhost:8000/details?username=${username}`);
     const txdata = await response.json();
     
-    setWallet(txdata[0].walletDetails[0].wallet);
+    setWallet(txdata[0].walletDetails[0].wallet)
 
   }
 
@@ -534,7 +534,7 @@ function ViewWallet(){
     <div className="txApp">
 
       <h1>VIEW WALLET</h1>
-      <DataTable value={wallet}>
+      <DataTable value={wallet} className='center'>
         <Column field="coin" header="Coin"/>
         <Column field="value" header="Value"/>
       </DataTable>
@@ -566,7 +566,7 @@ function TransactionHistory(){
     <div className="txApp">
 
       <h1>Transaction History</h1>
-      <DataTable value={tx}>
+      <DataTable value={tx} className='center'>
         <Column field="id" header="Id"/>
         <Column field="type" header="Type"/>
         <Column field="timestamp" header="Timestamp"/>
@@ -578,6 +578,114 @@ function TransactionHistory(){
 
     </div>
     );
+};
+
+function DepositCrypto(){
+
+  const localUsername = localStorage.getItem('username');
+  const [coinform, setCoinform] = useState('');
+  const [amountform, setAmountform] = useState('');
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    depositPost();
+  }
+
+  const depositPost = async () => {
+
+    /* Get all coins in wallet to see if coin already exist */
+    const response2 = await fetch(`http://localhost:8000/details?username=${localUsername}`);
+    const data2 = await response2.json();
+    
+    /* iterate through the coins in user wallets and see if they match with the users input*/
+    for (let i = 0; i < data2[0].walletDetails[0].wallet.length; ++i) {
+
+      if (data2[0].walletDetails[0].wallet[i].coin == coinform) {
+        /* If coin exists ...*/
+
+        fetch('http://localhost:8000/details')
+          .then(response => response.json())
+          .then(data => {
+            const user = data.find(obj => obj.username === localUsername);
+            if (user) {
+              user.walletDetails[0].wallet[i].value = Number(user.walletDetails[0].wallet[i].value) + Number(amountform)
+              // send updated data to server
+              fetch('http://localhost:8000/details', {
+                method: 'PUT',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+              })
+                .then(response => response.json())
+                .then(data => console.log(data))
+                .catch(error => console.error(error));
+            }
+          })
+          .catch(error => console.error(error));
+
+        console.log('done +')
+        break;
+
+      } else {
+        /* If coin doesn't exist ...*/
+
+        /* Create new pair ...*/
+        const coinPair = {
+          coin: coinform,
+          value: amountform
+        };
+
+        fetch('http://localhost:8000/details')
+          .then(response => response.json())
+          .then(data => {
+            const user = data.find(obj => obj.username === localUsername);
+            if (user) {
+              user.walletDetails[0].wallet.push(coinPair)
+              // send updated data to server
+              fetch('http://localhost:8000/details', {
+                method: 'PUT',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+              })
+                .then(response => response.json())
+                .then(data => console.log(data))
+                .catch(error => console.error(error));
+            }
+          })
+          .catch(error => console.error(error));
+        
+        console.log('done -')
+        break;
+      }
+    }
+  }
+
+  return(
+
+    <div className="center">
+      <h1>Deposit Crypto</h1>
+      <form className="form" onSubmit={handleSubmit}>
+        <div className="form-control">
+          <label>Crypto Symbol:</label>
+          <input type="text"
+            value={coinform} 
+            onChange={(e) => setCoinform(e.target.value)} 
+          required />
+        </div>
+        <div className="form-control">
+          <label>Amount:</label>
+          <input type="text"
+            value={amountform} 
+            onChange={(e) => setAmountform(e.target.value)} 
+          required />
+        </div>
+        <button type="submit">Deposit</button>
+      </form>
+      </div>
+  );
 };
 
 function App() {
@@ -593,6 +701,7 @@ function App() {
         <Route path="/sendCrypto" element={<SendCrypto/>} />
         <Route path="/viewWallet" element={<ViewWallet/>} />
         <Route path="/TransactionHistory" element={<TransactionHistory/>} />
+        <Route path="/receiveCrypto" element={<DepositCrypto/>}/>
         <Route path="/viewAssets" element={<ViewAssets/>} />
       </Routes>
     </Router>
