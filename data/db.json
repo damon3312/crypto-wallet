@@ -30,21 +30,27 @@
           "type": "RECEIVE",
           "timestamp": "19:01:59 11/04/2023",
           "sender": "3YPQr7x",
-          "receiver": "ELJscKq"
+          "receiver": "ELJscKq",
+          "coin": "BTC",
+          "amount": "0.05"
         },
         {
           "id": "1",
           "type": "SEND",
           "timestamp": "19:01:59 11/04/2023",
           "sender": "ELJscKq",
-          "receiver": "cJJWa4w"
+          "receiver": "cJJWa4w",
+          "coin": "BTC",
+          "amount": "0.05"
         },
         {
           "id": "3",
           "type": "RECEIVE",
           "timestamp": "20:01:59 11/04/2023",
           "sender": "cJJWa4w",
-          "receiver": "ELJscKq"
+          "receiver": "ELJscKq",
+          "coin": "ETH",
+          "amount": "0.075"
         }
       ],
       "walletDetails": [
@@ -60,6 +66,24 @@
             {
               "coin": "ETH",
               "value": 1.25
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "username": "damon2",
+      "password": "password2",
+      "id": "OUZFm9E",
+      "walletDetails": [
+        {
+          "walletName": "wallet1",
+          "walletAddress": "A9vM7p2aOnS2fcoQg0DGtzXLoS",
+          "walletPassword": "Password12345@",
+          "wallet": [
+            {
+              "coin": "BTC",
+              "value": "0.5"
             }
           ]
         }

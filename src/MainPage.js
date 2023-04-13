@@ -441,74 +441,129 @@ function CreateWallet() {
 }
 
 function SendCrypto() {
-  const [amount, setAmount] = useState('');
-  const [recipientAddress, setRecipientAddress] = useState('');
-  const [senderAddress, setSenderAddress] = useState('');
-  const [cryptoType, setCryptoType] = useState('avax'); // Default set to Avax
-  const [walletBalance, setWalletBalance] = useState(0);
 
-  const handleAmountChange = (event) => {
-    setAmount(event.target.value);
-  }
-
-  const handleRecipientAddressChange = (event) => {
-    setRecipientAddress(event.target.value);
-  }
-
-  const handleSenderAddressChange = (event) => {
-    setSenderAddress(event.target.value);
-  }
-
-  const handleCryptoTypeChange = (event) => {
-    setCryptoType(event.target.value);
-    setAmount(''); // Clear the amount when the crypto type changes
-  }
+  const localUsername = localStorage.getItem("username");
+  const [coinform , setCoinform] = useState();
+  const [amountform, setAmountform] = useState();
+  const [receiverform, setReceiverform] = useState();
 
   const handleSubmit = (event) => {
     event.preventDefault();
+    sendCrypto()
+  };
 
-    if (parseFloat(amount) > walletBalance) {
-      alert(`You don't have enough ${cryptoType} in your wallet to send ${amount} ${cryptoType}`);
-      return;
+  const sendCrypto = async () => {
+
+    // Get the user's wallet details
+    const response = await fetch(
+      `http://localhost:8000/details?username=${localUsername}`
+    );
+    const data = await response.json();
+
+    // Check if the coin exists in the user's wallet
+    const coinIndex = data[0].walletDetails[0].wallet.findIndex(
+      (coin) => coin.coin === coinform
+    );
+
+    // If coin in wallet
+    if (coinIndex >= 0) {
+
+      // If balance greater or equal to send request amount
+      if (Number(data[0].walletDetails[0].wallet[coinIndex].value) >= amountform) {
+
+          // Subtract value from users wallet
+          data[0].walletDetails[0].wallet[coinIndex].value =
+          Number(data[0].walletDetails[0].wallet[coinIndex].value) -
+          Number(amountform);
+
+          // Get the receivers's wallet details
+          const response2 = await fetch(
+            `http://localhost:8000/details?username=${receiverform}`
+          );
+          const data2 = await response2.json();
+
+          // Check if the coin already exists in the receivers's wallet
+          const coinIndex2 = data2[0].walletDetails[0].wallet.findIndex(
+            (coin) => coin.coin === coinform
+          );
+
+          if (coinIndex2 >= 0) {
+            // If the coin already exists, update its value
+            data2[0].walletDetails[0].wallet[coinIndex2].value =
+              Number(data[0].walletDetails[0].wallet[coinIndex2].value) +
+              Number(amountform);
+          } else {
+            // If the coin doesn't exist, create a new entry
+            data2[0].walletDetails[0].wallet.push({
+              coin: coinform,
+              value: amountform,
+            });
+          }
+
+          // Send the updated data to the server for user
+          fetch(`http://localhost:8000/details/${data[0].id}`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data[0]),
+          })
+            .then((response) => response.json())
+            .then((data) => console.log(data))
+            .catch((error) => console.error(error));
+
+          console.log("done");
+
+          // Send the updated data to the server for receiver
+          fetch(`http://localhost:8000/details/${data2[0].id}`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data[0]),
+          })
+            .then((response) => response.json())
+            .then((data) => console.log(data))
+            .catch((error) => console.error(error));
+
+          console.log("done");
+            }
+
     }
-
-    const data = {
-      amount: amount,
-      recipientAddress: recipientAddress,
-      senderAddress: senderAddress,
-      cryptoType: cryptoType
-    };
   }
-
   return (
-    <form onSubmit={handleSubmit}>
-      <div>
-        <label htmlFor="crypto-type">Cryptocurrency Type:</label>
-        <select id="crypto-type" value={cryptoType} onChange={handleCryptoTypeChange} style={{fontSize: "1.2em", width: "240px"}}>
-          <option value="avax">Avax</option>
-          <option value="luna">Luna</option>
-          <option value="fet">Fet</option>
-          <option value="doge">Doge</option>
-        </select>
+    <div className="center">
+      <h1>Send Crypto</h1>
+      <form className="form" onSubmit={handleSubmit}>
+        <div className="form-control">
+          <label>Crypto (Symbol):</label>
+          <input type="text"
+            value={coinform} 
+            onChange={(e) => setCoinform(e.target.value)} 
+          required />
+        </div>
+        <div className="form-control">
+          <label>Amount:</label>
+          <input type="text"
+            value={amountform} 
+            onChange={(e) => setAmountform(e.target.value)} 
+          required />
+        </div>
+        <div className="form-control">
+          <label>Receiver:</label>
+          <input type="text"
+            value={receiverform} 
+            onChange={(e) => setReceiverform(e.target.value)} 
+          required />
+        </div>
+        <button type="submit">Send</button>
+        <Link to="/dashboard"><button>Back</button></Link>
+      </form>
       </div>
-      <div>
-        <label htmlFor="amount">Amount ({cryptoType}):</label>
-        <input type="text" id="amount" value={amount} onChange={handleAmountChange} />
-        <span> (Max: {walletBalance} {cryptoType})</span>
-      </div>
-      <div>
-        <label htmlFor="sender-address">Wallet Address:</label>
-        <input type="text" id="sender-address" value={senderAddress} onChange={handleSenderAddressChange} />
-      </div>
-      <div>
-        <label htmlFor="recipient-address">Recipient Wallet Address:</label>
-        <input type="text" id="recipient-address" value={recipientAddress} onChange={handleRecipientAddressChange} />
-      </div>
-      <button type="submit">Send Cryptocurrency</button>
-      <Link to="/dashboard"><button>Back</button></Link>
-    </form>
-  );
+  ); 
 }
+
+
 
 function ViewWallet(){
 
@@ -649,6 +704,7 @@ function DepositCrypto() {
           required />
         </div>
         <button type="submit">Deposit</button>
+        <Link to="/dashboard"><button>Back</button></Link>
       </form>
       </div>
   );
